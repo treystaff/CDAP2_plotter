@@ -1,16 +1,16 @@
-import sqlite3
-def create_tables(db):
-  conn = sqlite3.connect(db)
-  c = conn.cursor()
+from mySqlite import *
 
-  c.execute('''CREATE TABLE scan_info
+def create_tables(db_path):
+  db = mySqlite(db_path)
+
+  db.query('''CREATE TABLE scan_info
     (ID INTEGER primary key,
     process_date text,
     acquire_date text,
     instrument text,
     pixels int)''')
 
-  c.execute('''CREATE TABLE scans
+  db.query('''CREATE TABLE scans
     (ID INTEGER primary key,
     scan_info_id REFERENCES scan_info(ID),
     scan text,
@@ -18,12 +18,13 @@ def create_tables(db):
     rep text,
     count int,
     X int,
-    Y int)''')
+    Y int,
+    time text)''')
 
-  c.execute('''CREATE TABLE scan_data (
+  db.query('''CREATE TABLE scan_data (
     ID INTEGER primary key,
     scan_id REFERENCES scans(ID),
     band double,
     ref double)''')
 
-  conn.commit()
+  db.commit()
