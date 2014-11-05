@@ -36,8 +36,12 @@ class scanData:
 
     band,ref = zip(*data)
 
+    #Add the matplotlib 2D line obj
     scaninfo['line'], = plt.plot(band,ref)
 
+    #Add a dict of line properties (properties filled in by user)
+    scaninfo['properties'] = {'color':None,'thickness':None,'style':None,
+      'label':None}
     self.selectedScans.append(scaninfo)
 
   def remove(self,idx):
@@ -47,6 +51,9 @@ class scanData:
       plt.show()
     return self.selectedScans.pop(idx)
 
+  def get_cur_scan(self):
+    if self.currentSelection is not None:
+      return self.selectedScans[self.currentSelection]
 
 class app:
   def __init__(self,master):
@@ -99,6 +106,7 @@ class app:
     self.create_selected_scans_listboxes()
     self.create_metadata_box()
     self.create_t3_frames()
+    self.create_line_color_button()
 
   def create_project_dropdown(self):
     #Create a label for the dropdown
@@ -135,6 +143,15 @@ class app:
     self.removeScanB = ttk.Button(self.t2,text='-',command=self.remove_scans)
     self.removeScanB.grid(column=1,row=2,sticky=(E))
 
+  def create_line_color_button(self):
+    self.lineColorB = ttk.Button(self.linePropertiesFrm,text='Choose Color',
+      command=self.choose_line_color)
+    self.lineColorB.grid(column=1,row=1,sticky=(E))
+
+    #ALSO A LABEL
+    self.colorLabel = ttk.Label(self.linePropertiesFrm,text='Line Color:')
+    self.colorLabel.grid(column=0,row=1,sticky=(W))
+
   def create_selected_scans_listboxes(self):
     #Tab2 listbox
     self.selectedListboxT2 = Listbox(self.t2)
@@ -147,10 +164,10 @@ class app:
 
   def update_selection(self,event):
     if event.widget == self.selectedListboxT2:
-      self.scanData.currentSelection = self.selectedListboxT2.curselection()[0]
+      self.scanData.currentSelection = int(self.selectedListboxT2.curselection()[0])
       self.selectedListboxT3.activate(self.scanData.currentSelection)
     else:
-      self.scanData.currentSelection = self.selectedListboxT3.curselection()[0]
+      self.scanData.currentSelection = int(self.selectedListboxT3.curselection()[0])
       self.selectedListboxT2.activate(self.scanData.currentSelection)
     self.populate_metadata()
 
@@ -189,8 +206,9 @@ class app:
   def choose_line_color(self):
     selectedColor = colorchooser.askcolor()
     if selectedColor:
-      pass
-
+      plt.setp(self.scanData.get_cur_scan()['line'],
+        color=selectedColor[-1])
+      self.scanData.get_cur_scan()['properties']['color'] = selectedColor[-1]
 
   def populate_scans(self,event):
     #FUNCTION TO POPULATE THE SCANS TREE.
@@ -253,7 +271,7 @@ class app:
     self.metaBox.config(state=NORMAL)
     self.metaBox.delete(0.0,END)
     #If there is a current selection, populate the metadata.
-    if self.scanData.currentSelection:
+    if self.scanData.currentSelection is not None:
       #Now, format and add the metadata information.
       metatext = 'Project: {project} \nScan: {scan} \nRep: {rep}\n(X,Y): ({x},{y})\n'
       metatext +='Count: {count} \nAcquire Date and Time: {acquire_date} at UTC {time} \n'
