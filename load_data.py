@@ -17,7 +17,7 @@ def load_CDAP2_data(db_path,data_path):
 
   #Get the processing date
   processing_date = clean_str(data[0][0][12:-15])
-  
+
   #Date of aquisition
   acquire_date = clean_str(data[2][0])
   acquire_date = acquire_date[:4]+'-'+acquire_date[4:6]+'-'+acquire_date[6:]
@@ -32,7 +32,6 @@ def load_CDAP2_data(db_path,data_path):
   scan_id = [clean_str(data[7][idx]) for idx in range(1,len(data[7]))]
 
   #Insert relevant information into the 'scan_info' table.
-  print([None,processing_date,acquire_date,instrument,pixels])
   db.query('INSERT INTO scan_info VALUES (?,?,?,?,?)',
     [None,processing_date,acquire_date,instrument,pixels])
 
