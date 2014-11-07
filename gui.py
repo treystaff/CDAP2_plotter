@@ -98,6 +98,9 @@ class app:
 
     self.nb.grid(row=0,column=0,sticky=(N,E,W,S))
 
+    #Set graph defualt properties
+    plt.xlabel('Wavelength')
+    plt.ylabel('Reflectance')
     #Turn on matplotlib's interactive plot
     plt.ion()
 
@@ -127,6 +130,8 @@ class app:
     self.create_line_color_button()
     self.create_line_label_entry()
     self.create_legend_checkButton()
+    self.create_graph_title_entry()
+    self.create_axis_labels()
 
   def create_project_dropdown(self):
     #Create a label for the dropdown
@@ -187,6 +192,45 @@ class app:
     self.scanData.set_label(self.lineLabelVar.get())
     if self.legendCBVar.get():
       plt.legend().set_visible(True)
+
+  def create_graph_title_entry(self):
+    self.graphTitleVar = StringVar()
+    self.graphTitleEntry = ttk.Entry(self.graphPropertiesFrm,textvariable=self.graphTitleVar)
+    self.graphTitleEntry.bind("<Return>",self.set_graph_title)
+    self.graphTitleEntry.grid(column=1,row=1)
+
+    #Create a label
+    self.graphTitleLabel = ttk.Label(self.graphPropertiesFrm,text='Graph Title:')
+    self.graphTitleLabel.grid(column=0,row=1)
+
+  def set_graph_title(self,event):
+    if self.graphTitleVar.get():
+      plt.title(self.graphTitleVar.get())
+
+  def create_axis_labels(self):
+    self.xLabelVar = StringVar()
+    self.xLabelEntry = ttk.Entry(self.graphPropertiesFrm,textvariable=self.xLabelVar)
+    self.xLabelEntry.insert(0,'Wavelength')
+    self.xLabelEntry.bind("<Return>",self.set_xAxis_label)
+    self.xLabelEntry.grid(column=1,row=2)
+    self.xLabelLabel = ttk.Label(self.graphPropertiesFrm,text='X Axis Label:')
+    self.xLabelLabel.grid(column=0,row=2)
+
+    self.yLabelVar = StringVar()
+    self.yLabelEntry = ttk.Entry(self.graphPropertiesFrm,textvariable=self.yLabelVar)
+    self.yLabelEntry.insert(0,'Reflectance')
+    self.yLabelEntry.bind("<Return>",self.set_yAxis_label)
+    self.yLabelEntry.grid(column=1,row=3)
+    self.yLabelLabel = ttk.Label(self.graphPropertiesFrm,text='Y Axis Label:')
+    self.yLabelLabel.grid(column=0,row=3)
+
+  def set_xAxis_label(self,event):
+    if self.xLabelVar.get():
+      plt.xlabel(self.xLabelVar.get())
+
+  def set_yAxis_label(self,event):
+    if self.yLabelVar.get():
+      plt.ylabel(self.yLabelVar.get())
 
   def create_legend_checkButton(self):
     self.legendCBVar = IntVar()
